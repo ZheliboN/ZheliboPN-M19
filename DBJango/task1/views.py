@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator
 from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.http import HttpResponse
@@ -81,7 +82,7 @@ def sign_up_by_django(request):
                     info['error'] = 'Пароли не совпадают'
             if register_user:
                 out_message = f'Приветствуем, {username}!'
-                Buyer.objects.create(name=username,balance=0,age=age)
+                Buyer.objects.create(name=username, balance=0, age=age)
                 print(out_message)
             else:
                 out_message = info['error']
@@ -91,3 +92,12 @@ def sign_up_by_django(request):
         form = UserRegister()
     info['form'] = form
     return render(request, 'registration_page.html', info)
+
+
+def news(request):
+    news_list = News.objects.all().order_by('-date')
+    paginator = Paginator(news_list, 3)
+    page_number = request.GET.get('page')
+    news = paginator.get_page(page_number)
+    context = {'news': news}
+    return render(request, 'news.html', context)
